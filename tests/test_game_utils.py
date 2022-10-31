@@ -14,7 +14,8 @@ def test_initialize_game_state():
 
 #split test
 
-#def test_pretty_print_board():
+def test_pretty_print_board():
+
 
 # def test_string_to_board():
 

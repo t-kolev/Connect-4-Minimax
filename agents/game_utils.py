@@ -24,7 +24,7 @@ def initialize_game_state() -> np.ndarray:
     """
     Returns an ndarray, shape (6, 7) and data type (dtype) BoardPiece, initialized to 0 (NO_PLAYER).
     """
-    board = np.full((6, 7),BoardPiece(0))
+    board = np.full((6, 7), BoardPiece(0), NO_PLAYER)
     return board
 
 
@@ -62,17 +62,6 @@ def pretty_print_board(board: np.ndarray) -> str:
     row += '\n' +'|0 1 2 3 4 5 6 |'
     return row
 
-#print(board._string_)
-
-"""""
- n, m = 6, 7
-    board = [["X" for i in range(m)] for j in range(n)]
-
-    print(" " * 3 + (" " * 3).join(["{}".format(i) for i in range(1, m + 1)]))
-    for j, bb in enumerate(board):
-        print("{}: ".format(j + 1) + " | ".join(bb))
-"""
-
 def string_to_board(pp_board: str) -> np.ndarray:
     """
     Takes the output of pretty_print_board and turns it back into an ndarray.
@@ -80,7 +69,8 @@ def string_to_board(pp_board: str) -> np.ndarray:
     board state as a string.
     """
 
-    raise NotImplementedError()
+
+
 
 
 def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPiece) -> np.ndarray:
@@ -94,7 +84,7 @@ def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPi
     for i in range(6):
         if board[i, action] == NO_PLAYER:
             board[i, action] = player
-
+    if ac
     return board
 
 
@@ -104,6 +94,7 @@ def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
     in either a horizontal, vertical, or diagonal line. Returns False otherwise.
     """
 
+    raise NotImplementedError()
 
 
 
