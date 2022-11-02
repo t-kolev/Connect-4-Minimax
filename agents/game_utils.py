@@ -50,7 +50,7 @@ def pretty_print_board(board: np.ndarray) -> str:
         row += "\n"
         for j in range(col_size):
             if board[i, j] == PLAYER1:
-                row += ' ' +PLAYER1_PRINT
+                row += ' ' + PLAYER1_PRINT
             elif board[i, j] == PLAYER2:
                 row += ' ' + PLAYER2_PRINT
             else:
@@ -58,13 +58,13 @@ def pretty_print_board(board: np.ndarray) -> str:
     row += '\n' + '|==============|' + '\n' + '|0 1 2 3 4 5 6 |'
     return row
 
+
 def string_to_board(pp_board: str) -> np.ndarray:
     """
     Takes the output of pretty_print_board and turns it back into an ndarray.
     This is quite useful for debugging, when the agent crashed and you have the last
     board state as a string.
     """
-
 
 
 def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPiece) -> np.ndarray:
@@ -87,6 +87,7 @@ def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPi
             raise ValueError
     return board
 
+
 def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
     """
     Returns True if there are four adjacent pieces equal to `player` arranged
@@ -104,7 +105,8 @@ def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
             # Check vertical locations for win
         for c in range(col_size):
             for r in range(row_size - 3):
-                if board[r][c] == player and board[r + 1][c] == player and board[r + 2][c] == player and board[r + 3][                    c] == player:
+                if board[r][c] == player and board[r + 1][c] == player and board[r + 2][c] == player and board[r + 3][
+                    c] == player:
                     return True
 
             # Check positively sloped diagonals
@@ -129,9 +131,9 @@ def check_end_state(board: np.ndarray, player: BoardPiece) -> GameState:
     action won (GameState.IS_WIN) or drawn (GameState.IS_DRAW) the game,
     or is play still on-going (GameState.STILL_PLAYING)?
     """
-    if (connected_four(board,player) == True) or (connected_four(board,player)==True):
+    if (connected_four(board, player) == True) or (connected_four(board, player) == True):
         GameState = 1
-    elif(board.all() != NO_PLAYER):
+    elif (board.all() == PLAYER1 or PLAYER2):
         GameState = -1
     else:
         GameState = 0
@@ -139,6 +141,7 @@ def check_end_state(board: np.ndarray, player: BoardPiece) -> GameState:
 
 
 from typing import Callable, Optional
+
 
 class SavedState:
     pass
@@ -148,4 +151,3 @@ GenMove = Callable[
     [np.ndarray, BoardPiece, Optional[SavedState]],  # Arguments for the generate_move function
     tuple[PlayerAction, Optional[SavedState]]  # Return type of the generate_move function
 ]
-
