@@ -59,6 +59,7 @@ def test_apply_player_action3():
         apply_player_action(board,PlayerAction(7),PLAYER1)
 
 
+
 def test_connected_four():
     board = np.full((6, 7), NO_PLAYER)
     assert connected_four(board, PLAYER1) == False
@@ -71,4 +72,7 @@ def test_connectd_four():
     board[1, 4] = PLAYER1
     board[1, 5] = PLAYER1
     assert connected_four(board, 1) == True
-# def test_checke_end_state():
+def test_check_end_state():
+    board = np.full((6, 7), NO_PLAYER)
+    if (connected_four(board,PLAYER1) == True) or (connected_four(board,PLAYER2)==True):
+        assert check_end_state(board,PLAYER1) == 1
