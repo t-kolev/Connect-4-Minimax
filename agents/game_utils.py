@@ -104,8 +104,7 @@ def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
             # Check vertical locations for win
         for c in range(col_size):
             for r in range(row_size - 3):
-                if board[r][c] == player and board[r + 1][c] == player and board[r + 2][c] == player and board[r + 3][
-                    c] == player:
+                if board[r][c] == player and board[r + 1][c] == player and board[r + 2][c] == player and board[r + 3][                    c] == player:
                     return True
 
             # Check positively sloped diagonals
@@ -139,5 +138,14 @@ def check_end_state(board: np.ndarray, player: BoardPiece) -> GameState:
     return GameState
 
 
+from typing import Callable, Optional
 
+class SavedState:
+    pass
+
+
+GenMove = Callable[
+    [np.ndarray, BoardPiece, Optional[SavedState]],  # Arguments for the generate_move function
+    tuple[PlayerAction, Optional[SavedState]]  # Return type of the generate_move function
+]
 
