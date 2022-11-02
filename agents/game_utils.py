@@ -24,8 +24,7 @@ def initialize_game_state() -> np.ndarray:
     """
     Returns an ndarray, shape (6, 7) and data type (dtype) BoardPiece, initialized to 0 (NO_PLAYER).
     """
-    board = np.full((6, 7), BoardPiece(0), NO_PLAYER)
-    return board
+    return np.full((6, 7), NO_PLAYER)
 
 
 def pretty_print_board(board: np.ndarray) -> str:
@@ -46,20 +45,17 @@ def pretty_print_board(board: np.ndarray) -> str:
     """
 
     row_size, col_size = board.shape
-    row = ''
-    row += '|==============|'
-    for i in range(row_size):
+    row = '|==============|'
+    for i in range(row_size)[::-1]:
         row += "\n"
         for j in range(col_size):
             if board[i, j] == PLAYER1:
-                row += ' X'
+                row += ' ' +PLAYER1_PRINT
             elif board[i, j] == PLAYER2:
-              row += ' O'
+                row += ' ' + PLAYER2_PRINT
             else:
-                row = ' '
-            # i need to print whole rows! but how?
-    row += '\n' + '|==============|'
-    row += '\n' +'|0 1 2 3 4 5 6 |'
+                row += ' ' + NO_PLAYER_PRINT
+    row += '\n' + '|==============|' + '\n' + '|0 1 2 3 4 5 6 |'
     return row
 
 def string_to_board(pp_board: str) -> np.ndarray:
@@ -71,8 +67,6 @@ def string_to_board(pp_board: str) -> np.ndarray:
 
 
 
-
-
 def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPiece) -> np.ndarray:
     """
     Sets board[i, action] = player, where i is the lowest open row. Raises a ValueError
@@ -80,13 +74,18 @@ def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPi
     board is returned and the original board should remain unchanged (i.e., either set
     back or copied beforehand).
     """
-    old_board = board.copy()
-    for i in range(6):
-        if board[i, action] == NO_PLAYER:
-            board[i, action] = player
-    if ac
-    return board
 
+    if action > 6 or action < 1:
+        raise ValueError
+    old_board = board.copy()
+    row_size, col_size = board.shape
+    for r in range(row_size)[::-1]:
+        if board[r, action] == NO_PLAYER:
+            board[r, action] = player
+            break
+        else:
+            raise ValueError
+    return board
 
 def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
     """
@@ -94,8 +93,35 @@ def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
     in either a horizontal, vertical, or diagonal line. Returns False otherwise.
     """
 
-    raise NotImplementedError()
+    row_size, col_size = board.shape
+    for c in range(col_size - 3):
+        for r in range(row_size):
+            print(board[r][c])
+            if board[r][c] == player and board[r][c + 1] == player and board[r][c + 2] == player and board[r][
+                c + 3] == player:
+                return True
 
+            # Check vertical locations for win
+        for c in range(col_size):
+            for r in range(row_size - 3):
+                if board[r][c] == player and board[r + 1][c] == player and board[r + 2][c] == player and board[r + 3][
+                    c] == player:
+                    return True
+
+            # Check positively sloped diagonals
+        for c in range(col_size - 3):
+            for r in range(row_size - 3):
+                if board[r][c] == player and board[r + 1][c + 1] == player and board[r + 2][c + 2] == player and \
+                        board[r + 3][c + 3] == player:
+                    return True
+
+            # Check negatively sloped diagonals
+        for c in range(col_size - 3):
+            for r in range(3, row_size):
+                if board[r][c] == player and board[r - 1][c + 1] == player and board[r - 2][c + 2] == player and \
+                        board[r - 3][c + 3] == player:
+                    return True
+        return False
 
 
 def check_end_state(board: np.ndarray, player: BoardPiece) -> GameState:
@@ -104,5 +130,7 @@ def check_end_state(board: np.ndarray, player: BoardPiece) -> GameState:
     action won (GameState.IS_WIN) or drawn (GameState.IS_DRAW) the game,
     or is play still on-going (GameState.STILL_PLAYING)?
     """
+
+
 
     raise NotImplementedError()
