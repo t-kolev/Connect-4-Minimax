@@ -37,7 +37,7 @@ def handle_illegal_moves(board: np.ndarray, column: PlayerAction):
     if not is_in_range:
         raise IndexError
 
-    is_open = board[-1, column] == NO_PLAYER
+    is_open = board[0, column] == NO_PLAYER
     if not is_open:
         raise ValueError
 

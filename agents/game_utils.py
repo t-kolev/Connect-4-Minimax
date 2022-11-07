@@ -1,5 +1,12 @@
 from enum import Enum
 import numpy as np
+from scipy.signal import convolve2d
+from typing import Callable, Optional
+
+
+class SavedState:
+    pass
+
 
 BoardPiece = np.int8  # The data type (dtype) of the board
 NO_PLAYER = BoardPiece(0)  # board[i, j] == NO_PLAYER where the position is empty
@@ -46,7 +53,7 @@ def pretty_print_board(board: np.ndarray) -> str:
 
     row_size, col_size = board.shape
     row = '|==============|'
-    for i in range(row_size)[::-1]:
+    for i in range(row_size):
         row += "\n"
         for j in range(col_size):
             if board[i, j] == PLAYER1:
@@ -66,6 +73,15 @@ def string_to_board(pp_board: str) -> np.ndarray:
     board state as a string.
     """
 
+    rows = pp_board.split('/n')
+    print(rows)
+
+
+
+    # slice
+    # func that transforms rows in array row
+
+
 
 def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPiece) -> np.ndarray:
     """
@@ -75,17 +91,17 @@ def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPi
     back or copied beforehand).
     """
 
-    if action > 6 or action < 1:
+    if action > 6 or action < 0:
         raise ValueError
-    old_board = board.copy()
+    board_modiffied = board.copy()
     row_size, col_size = board.shape
     for r in range(row_size)[::-1]:
-        if board[r, action] == NO_PLAYER:
-            board[r, action] = player
+        if board_modiffied[r, action] == NO_PLAYER:
+            board_modiffied[r, action] = player
             break
-        else:
+        if r == 0:
             raise ValueError
-    return board
+    return board_modiffied
 
 
 def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
@@ -94,35 +110,16 @@ def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
     in either a horizontal, vertical, or diagonal line. Returns False otherwise.
     """
 
-    row_size, col_size = board.shape
-    for c in range(col_size - 3):
-        for r in range(row_size):
-            print(board[r][c])
-            if board[r][c] == player and board[r][c + 1] == player and board[r][c + 2] == player and board[r][
-                c + 3] == player:
-                return True
+    horizontal_kernel = np.array([[1, 1, 1, 1]])
+    vertical_kernel = np.transpose(horizontal_kernel)
+    diag1_kernel = np.eye(4, dtype=np.uint8)
+    diag2_kernel = np.fliplr(diag1_kernel)
+    detection_kernels = [horizontal_kernel, vertical_kernel, diag1_kernel, diag2_kernel]
 
-            # Check vertical locations for win
-        for c in range(col_size):
-            for r in range(row_size - 3):
-                if board[r][c] == player and board[r + 1][c] == player and board[r + 2][c] == player and board[r + 3][
-                    c] == player:
-                    return True
-
-            # Check positively sloped diagonals
-        for c in range(col_size - 3):
-            for r in range(row_size - 3):
-                if board[r][c] == player and board[r + 1][c + 1] == player and board[r + 2][c + 2] == player and \
-                        board[r + 3][c + 3] == player:
-                    return True
-
-            # Check negatively sloped diagonals
-        for c in range(col_size - 3):
-            for r in range(3, row_size):
-                if board[r][c] == player and board[r - 1][c + 1] == player and board[r - 2][c + 2] == player and \
-                        board[r - 3][c + 3] == player:
-                    return True
-        return False
+    for kernel in detection_kernels:
+        if (convolve2d(board == player, kernel, mode="valid") == 4).any():
+            return True
+    return False
 
 
 def check_end_state(board: np.ndarray, player: BoardPiece) -> GameState:
@@ -131,20 +128,13 @@ def check_end_state(board: np.ndarray, player: BoardPiece) -> GameState:
     action won (GameState.IS_WIN) or drawn (GameState.IS_DRAW) the game,
     or is play still on-going (GameState.STILL_PLAYING)?
     """
-    if (connected_four(board, player) == True) or (connected_four(board, player) == True):
-        GameState = 1
-    elif (board.all() == PLAYER1 or PLAYER2):
-        GameState = -1
+
+    if connected_four(board, player):
+        return GameState.IS_WIN
+    elif np.all(board != NO_PLAYER):
+        return GameState.IS_DRAW
     else:
-        GameState = 0
-    return GameState
-
-
-from typing import Callable, Optional
-
-
-class SavedState:
-    pass
+        return GameState.STILL_PLAYING
 
 
 GenMove = Callable[
