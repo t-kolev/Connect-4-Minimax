@@ -34,10 +34,18 @@ def test_pretty_print_board_forboardplayer3():
 def test_pretty_print_board_forboardplayer4():
     board = np.full((6, 7), NO_PLAYER)
     board[0, :] = PLAYER2
+    print(pretty_print_board(board))
+
     assert "O O O O O O O" in pretty_print_board(board)
 
 
-# def test_string_to_board():
+def test_string_to_board():
+    board = np.full((6, 7), NO_PLAYER)
+    board[:4 :2] = PLAYER2
+    print(board)
+
+    pp_str = pretty_print_board(board)
+    print(string_to_board(pp_str))
 
 def test_apply_player_action():
     board = np.full((6, 7), 0)

@@ -20,7 +20,6 @@ PLAYER2_PRINT = BoardPiecePrint('O')
 
 PlayerAction = np.int8  # The column to be played
 
-
 class GameState(Enum):
     IS_WIN = 1
     IS_DRAW = -1
@@ -54,7 +53,7 @@ def pretty_print_board(board: np.ndarray) -> str:
     row_size, col_size = board.shape
     row = '|==============|'
     for i in range(row_size):
-        row += "\n"
+        row += "\n" + '|'
         for j in range(col_size):
             if board[i, j] == PLAYER1:
                 row += ' ' + PLAYER1_PRINT
@@ -62,7 +61,8 @@ def pretty_print_board(board: np.ndarray) -> str:
                 row += ' ' + PLAYER2_PRINT
             else:
                 row += ' ' + NO_PLAYER_PRINT
-    row += '\n' + '|==============|' + '\n' + '|0 1 2 3 4 5 6 |'
+        row += '|'
+    row += '\n' + '|==============|' + '\n' + '| 0 1 2 3 4 5 6|'
     return row
 
 
@@ -72,16 +72,17 @@ def string_to_board(pp_board: str) -> np.ndarray:
     This is quite useful for debugging, when the agent crashed and you have the last
     board state as a string.
     """
+    board = np.full((6, 7), NO_PLAYER)
+    split_string = pp_board.split('\n')
+    sliced_str = slice(1, 7)
 
-    rows = pp_board.split('/n')
-    print(rows)
-
-
-
-    # slice
-    # func that transforms rows in array row
-
-
+    for row_num, row in enumerate(split_string[sliced_str]):
+        for col_num, col_piece in enumerate(row[2:15:2]):
+            if col_piece == PLAYER1_PRINT:
+                board[row_num, col_num] = PLAYER1
+            if col_piece == PLAYER2_PRINT:
+                board[row_num, col_num] = PLAYER2
+    return board
 
 def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPiece) -> np.ndarray:
     """
@@ -93,15 +94,15 @@ def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPi
 
     if action > 6 or action < 0:
         raise ValueError
-    board_modiffied = board.copy()
+    board_modified = board.copy()
     row_size, col_size = board.shape
     for r in range(row_size)[::-1]:
-        if board_modiffied[r, action] == NO_PLAYER:
-            board_modiffied[r, action] = player
+        if board_modified[r, action] == NO_PLAYER:
+            board_modified[r, action] = player
             break
         if r == 0:
             raise ValueError
-    return board_modiffied
+    return board_modified
 
 
 def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
