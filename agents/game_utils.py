@@ -20,10 +20,17 @@ PLAYER2_PRINT = BoardPiecePrint('O')
 
 PlayerAction = np.int8  # The column to be played
 
+
 class GameState(Enum):
     IS_WIN = 1
     IS_DRAW = -1
     STILL_PLAYING = 0
+
+
+GenMove = Callable[
+    [np.ndarray, BoardPiece, Optional[SavedState]],  # Arguments for the generate_move function
+    tuple[PlayerAction, Optional[SavedState]]  # Return type of the generate_move function
+]
 
 
 def initialize_game_state() -> np.ndarray:
@@ -84,6 +91,7 @@ def string_to_board(pp_board: str) -> np.ndarray:
                 board[row_num, col_num] = PLAYER2
     return board
 
+
 def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPiece) -> np.ndarray:
     """
     Sets board[i, action] = player, where i is the lowest open row. Raises a ValueError
@@ -136,9 +144,3 @@ def check_end_state(board: np.ndarray, player: BoardPiece) -> GameState:
         return GameState.IS_DRAW
     else:
         return GameState.STILL_PLAYING
-
-
-GenMove = Callable[
-    [np.ndarray, BoardPiece, Optional[SavedState]],  # Arguments for the generate_move function
-    tuple[PlayerAction, Optional[SavedState]]  # Return type of the generate_move function
-]

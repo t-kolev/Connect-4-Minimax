@@ -41,11 +41,12 @@ def test_pretty_print_board_forboardplayer4():
 
 def test_string_to_board():
     board = np.full((6, 7), NO_PLAYER)
-    board[:4 :2] = PLAYER2
+    board[:4:2] = PLAYER2
     print(board)
 
     pp_str = pretty_print_board(board)
     print(string_to_board(pp_str))
+
 
 def test_apply_player_action():
     board = np.full((6, 7), 0)
@@ -57,18 +58,19 @@ def test_apply_player_action():
     print(pretty_print_board(board))
     assert board[5, 1] == PLAYER1
 
-    #testing to see that when the collumn is full you get a ValueError
+    # testing to see that when the collumn is full you get a ValueError
+
+
 def test_apply_player_action22():
     with pytest.raises(ValueError):
         board = np.full((6, 7), 0)
-        board[5,1] = PLAYER1
-        board[4,1] = PLAYER1
-        board[3,1] = PLAYER1
-        board[2,1] = PLAYER1
+        board[5, 1] = PLAYER1
+        board[4, 1] = PLAYER1
+        board[3, 1] = PLAYER1
+        board[2, 1] = PLAYER1
         apply_player_action(board, PlayerAction(1), PLAYER1)
         apply_player_action(board, PlayerAction(1), PLAYER1)
         apply_player_action(board, PlayerAction(1), PLAYER1)
-
 
 
 def test_apply_player_action2():
@@ -83,7 +85,6 @@ def test_apply_player_action3():
     with pytest.raises(ValueError):
         board = np.full((6, 7), NO_PLAYER)
         apply_player_action(board, PlayerAction(7), PLAYER1)
-
 
 
 def test_connected_four():
@@ -113,7 +114,7 @@ def test_connectd_four2():
 def test_connectd_four3():
     board = np.full((6, 7), NO_PLAYER)
     for i in range(4):
-        apply_player_action(board,i,PLAYER2)
+        apply_player_action(board, i, PLAYER2)
     print(board)
     assert connected_four(board, PLAYER2) == True
 
@@ -126,15 +127,18 @@ def test_check_end_state():
 def test_check_end_state2():
     board = np.full((6, 7), NO_PLAYER)
     for i in range(4):
-        apply_player_action(board,i,PLAYER2)
+        apply_player_action(board, i, PLAYER2)
     print(board)
     assert check_end_state(board, PLAYER1) == GameState.IS_WIN
+
 
 def test_check_end_state11():
     board = np.full((6, 7), NO_PLAYER)
 
     print(board)
     assert check_end_state(board, PLAYER1) == GameState.IS_DRAW
+
+
 def test_check_end_state11():
     board = np.full((6, 7), NO_PLAYER)
     for i in range(4):
@@ -142,7 +146,8 @@ def test_check_end_state11():
     ppprint = pretty_print_board(board)
     string_to_board(ppprint)
     assert True
+
+
 def test_check():
     board = np.full((6, 7), PLAYER1)
     assert GameState.IS_DRAW == check_end_state(board, PLAYER2)
-

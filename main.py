@@ -1,4 +1,4 @@
-from agents.game_utils import *
+
 from typing import Callable
 from agents.game_utils import GenMove
 from agents.agent_human_user import user_move
@@ -58,5 +58,5 @@ def human_vs_agent(
 
 
 if __name__ == "__main__":
-  human_vs_agent(user_move)
-  #human_vs_agent(generate_move)
+  #human_vs_agent(user_move)
+  human_vs_agent(generate_move)

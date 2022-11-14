@@ -15,8 +15,9 @@ def generate_move_random(
     # Choose a valid, non-full column randomly and return it as `action`
     while True:
         random_col = PlayerAction(random.randint(0, 6))
+        new_board = board.copy()
         try:
-            apply_player_action(board, random_col, player)
+            apply_player_action(new_board, random_col, player)
             break
         except:
             ValueError("The column is full")
