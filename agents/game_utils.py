@@ -57,6 +57,8 @@ def pretty_print_board(board: np.ndarray) -> str:
     |0 1 2 3 4 5 6 |
     """
 
+    #codesmell?
+
     row_size, col_size = board.shape
     row = '|==============|'
     for i in range(row_size):
@@ -71,6 +73,12 @@ def pretty_print_board(board: np.ndarray) -> str:
         row += '|'
     row += '\n' + '|==============|' + '\n' + '| 0 1 2 3 4 5 6|'
     return row
+
+
+# board[i, j:j + CONNECT_N]
+# broadcasting
+# numba
+# @njit
 
 
 def string_to_board(pp_board: str) -> np.ndarray:
@@ -102,31 +110,48 @@ def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPi
 
     if action > 6 or action < 0:
         raise ValueError
-    board_modified = board.copy()
+    new_board = board.copy()
+    row = lowest_row(new_board, action)
+    new_board[row, action] = player
+    return new_board
+
+
+def lowest_row(board: np.ndarray, action: PlayerAction) -> int:
+    """
+    returns the correct row, where the move should be executed
+
+    :param board:
+    :param action:
+    :return:
+    """
     row_size, col_size = board.shape
     for r in range(row_size)[::-1]:
-        if board_modified[r, action] == NO_PLAYER:
-            board_modified[r, action] = player
-            break
+        if board[r, action] == NO_PLAYER:
+            return r
         if r == 0:
             raise ValueError
-    return board_modified
 
 
 def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
     """
     Returns True if there are four adjacent pieces equal to `player` arranged
     in either a horizontal, vertical, or diagonal line. Returns False otherwise.
+
+    :param board:
+    :param player:
+    :return:
+
     """
 
-    horizontal_kernel = np.array([[1, 1, 1, 1]])
-    vertical_kernel = np.transpose(horizontal_kernel)
-    diag1_kernel = np.eye(4, dtype=np.uint8)
-    diag2_kernel = np.fliplr(diag1_kernel)
-    detection_kernels = [horizontal_kernel, vertical_kernel, diag1_kernel, diag2_kernel]
+    row_kernel = np.ones((4, 1), player)
+    column_kernel = np.transpose(row_kernel)
+    dia_kernel = np.eye(4, dtype=player)
+    flipped_dia_kernel = np.fliplr(dia_kernel)
+    kernels = [row_kernel, column_kernel, dia_kernel, flipped_dia_kernel]
 
-    for kernel in detection_kernels:
-        if (convolve2d(board == player, kernel, mode="valid") == 4).any():
+    for kernel in kernels:
+        result = (convolve2d(board == player, kernel, mode="full") == 4)
+        if result.any():
             return True
     return False
 
