@@ -3,7 +3,6 @@ import numpy as np
 from scipy.signal import convolve2d
 from typing import Callable, Optional
 
-
 class SavedState:
     pass
 
@@ -57,9 +56,10 @@ def pretty_print_board(board: np.ndarray) -> str:
     |0 1 2 3 4 5 6 |
     """
 
-    #codesmell?
+# codesmell?
 
     row_size, col_size = board.shape
+    #newboard = np.flipud(board)
     row = '|==============|'
     for i in range(row_size):
         row += "\n" + '|'
@@ -74,11 +74,7 @@ def pretty_print_board(board: np.ndarray) -> str:
     row += '\n' + '|==============|' + '\n' + '| 0 1 2 3 4 5 6|'
     return row
 
-
-# board[i, j:j + CONNECT_N]
-# broadcasting
-# numba
-# @njit
+# bei dem test nicht richtig, aber in main schon
 
 
 def string_to_board(pp_board: str) -> np.ndarray:
@@ -106,6 +102,7 @@ def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPi
     if action is not a legal move. If it is a legal move, the modified version of the
     board is returned and the original board should remain unchanged (i.e., either set
     back or copied beforehand).
+
     """
 
     if action > 6 or action < 0:
