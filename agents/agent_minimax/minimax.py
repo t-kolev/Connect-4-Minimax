@@ -6,6 +6,12 @@ import numpy as np
 
 
 def pick_best_move(board: np.ndarray, player: PlayerAction) -> PlayerAction:
+    """
+    Picks the best move for the board at depth == 0
+    :param board:
+    :param player:
+    :return:
+    """
     best_score = -10000
     best_col = random.choice(valid_moves(board))
     for col in valid_moves(board):
@@ -19,6 +25,12 @@ def pick_best_move(board: np.ndarray, player: PlayerAction) -> PlayerAction:
 
 
 def count_elements(four_piece: list, player: PlayerAction) -> int:
+    """
+
+    :param four_piece:
+    :param player:
+    :return:
+    """
     if player == PLAYER1:
         player1 = four_piece.count(PLAYER1)
         player2 = four_piece.count(PLAYER2)
@@ -87,7 +99,7 @@ def score_for_cols(board: np.ndarray, player: PlayerAction) -> int:
 
 def score_for_dias1(board: np.ndarray, player: PlayerAction) -> int:
     """
-    takes whole rows of the board and calculates the score with the check4_of_row func
+     calculates the score for all the diagonals pointing from down left  to right up
 
     :param board:
     :param player:
@@ -103,7 +115,8 @@ def score_for_dias1(board: np.ndarray, player: PlayerAction) -> int:
 
 def score_for_dias2(board: np.ndarray, player: PlayerAction) -> int:
     """
-    takes whole rows of the board and calculates the score with the check4_of_row func
+     calculates the score for all the diagonals pointing from down right to left up
+
     :param board:
     :param player:
     :return:
@@ -130,6 +143,12 @@ def score_for_dias1(board: np.ndarray):
 
 
 def check4_of_row(row: np.ndarray, player: PlayerAction) -> int:
+    """
+    checks all the subarrays with length 4 in each row
+    :param row:
+    :param player:
+    :return:
+    """
     score = 0
     for i in range(3):
         four_piece = row[i:i + 4].tolist()
@@ -138,6 +157,12 @@ def check4_of_row(row: np.ndarray, player: PlayerAction) -> int:
 
 
 def check4_of_col(col: np.ndarray, player: PlayerAction) -> int:
+    """
+    checks all the subarrays with length 4 in each column
+    :param col:
+    :param player:
+    :return:
+    """
     score = 0
     for i in range(3):
         four_piece = col[i:i + 4].tolist()
@@ -146,6 +171,7 @@ def check4_of_col(col: np.ndarray, player: PlayerAction) -> int:
 
 
 def minimax(board: np.ndarray, depth: int, maximizingPlayer: bool) -> Tuple[PlayerAction, int]:
+
     if depth == 0 or GameState == GameState.IS_WIN:
         if not valid_moves(board):
             return None, 0
@@ -186,6 +212,11 @@ def minPlayer(board: np.ndarray, depth: int):
 
 
 def valid_moves(board: np.ndarray) -> list[PlayerAction]:
+    """
+    creates a list of all the valid moves for the board
+    :param board:
+    :return:
+    """
     all_v_moves = []
     for c in range(7):
         if board[0, c] == NO_PLAYER:
