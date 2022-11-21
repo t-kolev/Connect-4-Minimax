@@ -6,7 +6,10 @@ from agents.game_utils import *
 
 def test_minimax():
     board = np.full((6, 7), NO_PLAYER)
-
+    for i in range(6):
+        for j in range(7):
+            board[i,j] = random.randint(0,100)
+    board[0,:] = NO_PLAYER
     expected_score = 0
     score = minimax(board, 1, True)
     assert score == expected_score
@@ -15,29 +18,52 @@ def test_minimax():
 def test_minimax2():
     board = np.full((6, 7), NO_PLAYER)
     expected_score = 0
-    score = minimax(board, 1, True)
+    score = minimax(board, 2, True)
     assert score == expected_score
 
-def evaluation_function(self, state):
-    if self.current_move == 1:
-        o_color = 2
-    elif self.current_move == 2:
-        o_color = 1
-    my_fours = self.checkForStreak(state, self.current_move, 4)
-    my_threes = self.checkForStreak(state, self.current_move, 3)
-    my_twos = self.checkForStreak(state, self.current_move, 2)
-    comp_fours = self.checkForStreak(state, o_color, 4)
-    comp_threes = self.checkForStreak(state, o_color, 3)
-    comp_twos = self.checkForStreak(state, o_color, 2)
-    return (my_fours * 10 + my_threes * 5 + my_twos * 2) - (comp_fours * 10 + comp_threes * 5 + comp_twos * 2)
+def test_best_move():
+    board = np.full((6, 7), NO_PLAYER)
+    board[5,0] = PLAYER1
+    board[5,1] = PLAYER1
+    board[5,2] = PLAYER1
+    board[5,4] = PLAYER2
 
+    expected_score = 100
+    score = pick_best_move(board,PLAYER1)
+    assert score == expected_score
+def test_best_move2():
+    board = np.full((6, 7), NO_PLAYER)
+    board[5,0] = PLAYER1
+    board[5,1] = PLAYER1
+    board[5,2] = PLAYER1
+    board[5,4] = PLAYER2
 
-def checkForStreak(self, state, color, streak):
-    count = 0
-    for i in range(6):
-        for j in range(7):
-            if state[i][j] == color:
-                count += self.verticalStreak(i, j, state, streak)
-                count += self.horizontalStreak(i, j, state, streak)
-                count += self.diagonalCheck(i, j, state, streak)
-    return count
+    expected_move = PlayerAction(3)
+    score = pick_best_move(board,PLAYER1)
+    assert score == expected_move
+def test_best_move3():
+    board = np.full((6, 7), NO_PLAYER)
+    board[5,0] = PLAYER1
+    board[5,1] = PLAYER1
+    board[5,2] = PLAYER1
+    board[5,4] = PLAYER2
+
+    expected_move = PlayerAction(3)
+    score = pick_best_move(board,PLAYER1)
+    assert score == expected_move
+
+def test_minimax3():
+    board = np.full((6, 7), NO_PLAYER)
+    expected_score = 0
+    score = minimax(board, 2, True)[0]
+    assert score == expected_score
+
+def test_minimax4():
+    board = np.full((6, 7), NO_PLAYER)
+    board[5, 0] = PLAYER1
+    board[5, 1] = PLAYER1
+    board[5, 2] = PLAYER1
+    board[5, 4] = PLAYER2
+
+    expected_move = PlayerAction(3)
+    assert minimax(board,4,True)[0] == expected_move
