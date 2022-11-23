@@ -35,26 +35,20 @@ def test_pretty_print_board_for_player1():
 
 def test_pretty_print_board_for_player2():
     board = np.full((6, 7), NO_PLAYER)
-    board[5, 0] = PLAYER2
-    print(board)
-    print(pretty_print_board(board))
-    assert PLAYER2_PRINT in pretty_print_board(board)
+    assert NO_PLAYER_PRINT in pretty_print_board(board)
 
 
 def test_pretty_print_board_for_noplayer():
     board = np.full((6, 7), PLAYER1)
     board[0, 0] = NO_PLAYER
-    newboard = np.flipud(board)
-    print(board)
-    print(newboard)
-    print(pretty_print_board(board))
+
     assert NO_PLAYER_PRINT in pretty_print_board(board)
 
 
 def test_pretty_print_board_for_row_player2():
     board = np.full((6, 7), NO_PLAYER)
     board[5, :] = PLAYER2
-    print(pretty_print_board(board))
+
 
     assert "O O O O O O O" in pretty_print_board(board)
 
@@ -62,36 +56,29 @@ def test_pretty_print_board_for_row_player2():
 def test_pretty_print_board_for_row_player1():
     board = np.full((6, 7), NO_PLAYER)
     board[5, :] = PLAYER1
-    print(pretty_print_board(board))
 
-    assert "X X X X X X X" in pretty_print_board(board)
-
-
-def test_pretty_print_board_for_col_player1():
-    board = np.full((6, 7), NO_PLAYER)
-    board[:, 0] = PLAYER1
-    print(pretty_print_board(board))
-
-    assert "O O O O O O O" in pretty_print_board(board)
-
-
-def test_pretty_print_board_for_col_player2():
-    board = np.full((6, 7), NO_PLAYER)
-    board[:, 2] = PLAYER1
-    print(pretty_print_board(board))
 
     assert "X X X X X X X" in pretty_print_board(board)
 
 
 # Test for func initialize_game_state()
 
-def test_string_to_board():
+def test_string_to_board_player2():
     board = np.full((6, 7), NO_PLAYER)
     board[:4:2] = PLAYER2
-    print(board)
-
     pp_str = pretty_print_board(board)
-    print(string_to_board(pp_str))
+    expected_board = string_to_board(pp_str)
+
+    assert board.all() == expected_board.all()
+
+
+def test_string_to_board_player1():
+    board = np.full((6, 7), NO_PLAYER)
+    board[:6:2] = PLAYER1
+    pp_str = pretty_print_board(board)
+    expected_board = string_to_board(pp_str)
+
+    assert board.all() == expected_board.all()
 
 
 # Test for func apply_player_action()
@@ -102,31 +89,49 @@ def test_apply_player_action():
 
     assert new_board[5, 1] == PLAYER1
 
-    # testing to see that when the column is full you get a ValueError
 
-
-def test_apply_player_action22():
+def test_apply_player_action3():
     with pytest.raises(ValueError):
         board = np.full((6, 7), NO_PLAYER)
         board[:, 1] = PLAYER1
         apply_player_action(board, PlayerAction(1), PLAYER1)
 
 
-def test_apply_player_action2():
+def test_apply_player_action4():
+    board = np.full((6, 7), NO_PLAYER)
+    new_board = apply_player_action(board, PlayerAction(1), PLAYER1)
+
+    assert new_board[5, 1] == PLAYER1
+
+
+def test_apply_player_action4_1():
+    board = np.full((6, 7), NO_PLAYER)
+    new_board = apply_player_action(board, PlayerAction(1), PLAYER2)
+
+    assert new_board[5, 1] == PLAYER2
+
+
+# Test for func lowest_row()
+def test_lowest_row():
+    board = np.full((6, 7), NO_PLAYER)
+    correct_lowes_row = 5
+
+    assert correct_lowes_row == lowest_row(board, PlayerAction(1))
+
+
+# testing to see that when the column is full you get a ValueError
+def test_lowest_row_2():
+    with pytest.raises(ValueError):
+        board = np.full((6, 7), PLAYER1)
+        lowest_row(board, PlayerAction(0))
+
+
+def test_lowest_row_3():
     with pytest.raises(ValueError):
         board = np.full((6, 7), NO_PLAYER)
         board[:, 0] = PLAYER2
 
-        apply_player_action(board, PlayerAction(0), PLAYER1)
-
-
-def test_apply_player_action3():
-    with pytest.raises(ValueError):
-        board = np.full((6, 7), NO_PLAYER)
-        apply_player_action(board, PlayerAction(7), PLAYER1)
-
-
-# Test for func lowest_row()
+        lowest_row(board, PlayerAction(0))
 
 
 # Test for func connected_four()
@@ -171,7 +176,27 @@ def test_connected_four3():
 
     assert connected_four(flipped_board, PLAYER1) == True
 
-    # Test for func check_end_state()
+
+def test_connected_four4():
+    board = np.full((6, 7), NO_PLAYER)
+    for i in range(4):
+        board[i, i] = PLAYER1
+    board[3, 3] = PLAYER2
+    flipped_board = np.fliplr(board)
+
+    assert connected_four(flipped_board, PLAYER1) == False
+
+
+def test_connected_four5():
+    board = np.full((6, 7), NO_PLAYER)
+    for i in range(3):
+        board[i, i] = PLAYER1
+    flipped_board = np.fliplr(board)
+
+    assert connected_four(flipped_board, PLAYER1) == False
+
+
+# Test for func check_end_state()
 
 
 def test_check_end_state():

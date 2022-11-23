@@ -3,6 +3,7 @@ import numpy as np
 from scipy.signal import convolve2d
 from typing import Callable, Optional
 
+
 class SavedState:
     pass
 
@@ -21,6 +22,13 @@ PlayerAction = np.int8  # The column to be played
 
 
 class GameState(Enum):
+    """A class used to represent the GameStates.
+
+    Attributes:
+        IS_WIN
+        IS_DRAW
+        STILL_PLAYIN
+    """
     IS_WIN = 1
     IS_DRAW = -1
     STILL_PLAYING = 0
@@ -33,60 +41,71 @@ GenMove = Callable[
 
 
 def initialize_game_state() -> np.ndarray:
+    """Returns a boad  with shape (6, 7) and data type (dtype) BoardPiece, initialized to 0 (NO_PLAYER).
+
+    Returns:
+        np.ndarray: The board with correct attributes
+
     """
-    Returns an ndarray, shape (6, 7) and data type (dtype) BoardPiece, initialized to 0 (NO_PLAYER).
-    """
+
     return np.full((6, 7), NO_PLAYER)
 
 
 def pretty_print_board(board: np.ndarray) -> str:
-    """
-    Should return `board` converted to a human readable string representation,
-    to be used when playing or printing diagnostics to the console (stdout). The piece in
-    board[0, 0] should appear in the lower-left. Here's an example output, note that we use
-    PLAYER1_Print to represent PLAYER1 and PLAYER2_Print to represent PLAYER2):
-    |==============|
-    |              |
-    |              |
-    |    X X       |
-    |    O X X     |
-    |  O X O O     |
-    |  O O X X     |
-    |==============|
-    |0 1 2 3 4 5 6 |
-    """
+    """Converts a board state into a human readable string representation.
 
-# codesmell?
+    Args:
+        board: The current state of the game.
+
+    Returns:
+        str: The human readable string representation of the board.
+    """
 
     row_size, col_size = board.shape
-    #newboard = np.flipud(board)
     row = '|==============|'
     for i in range(row_size):
         row += "\n" + '|'
         for j in range(col_size):
-            if board[i, j] == PLAYER1:
-                row += ' ' + PLAYER1_PRINT
-            elif board[i, j] == PLAYER2:
-                row += ' ' + PLAYER2_PRINT
-            else:
-                row += ' ' + NO_PLAYER_PRINT
+            row += piece_recognition(board, i, j)
         row += '|'
     row += '\n' + '|==============|' + '\n' + '| 0 1 2 3 4 5 6|'
     return row
 
+
 # bei dem test nicht richtig, aber in main schon
 
 
-def string_to_board(pp_board: str) -> np.ndarray:
+def piece_recognition(board: np.ndarray, i: int, j: int) -> str:
+    """Converts the Player piece into the player's piece print.
+
+    Args:
+        board : The current state of the game.
+        i: The row index of the board.
+        j: The column index of the board.
+
+    Returns:
+        str: The player's print.
     """
-    Takes the output of pretty_print_board and turns it back into an ndarray.
-    This is quite useful for debugging, when the agent crashed and you have the last
-    board state as a string.
+    if board[i, j] == PLAYER1:
+        return ' ' + PLAYER1_PRINT
+    elif board[i, j] == PLAYER2:
+        return ' ' + PLAYER2_PRINT
+    else:
+        return ' ' + NO_PLAYER_PRINT
+
+
+def string_to_board(pp_board: str) -> np.ndarray:
+    """Converts a string representation of a bord into a np.ndarray.
+
+    Args:
+        pp_board: The string representation of a board.
+
+    Returns:
+        The converted board as a np.ndarray.
     """
     board = np.full((6, 7), NO_PLAYER)
     split_string = pp_board.split('\n')
     sliced_str = slice(1, 7)
-
     for row_num, row in enumerate(split_string[sliced_str]):
         for col_num, col_piece in enumerate(row[2:15:2]):
             if col_piece == PLAYER1_PRINT:
@@ -97,11 +116,15 @@ def string_to_board(pp_board: str) -> np.ndarray:
 
 
 def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPiece) -> np.ndarray:
-    """
-    Sets board[i, action] = player, where i is the lowest open row. Raises a ValueError
-    if action is not a legal move. If it is a legal move, the modified version of the
-    board is returned and the original board should remain unchanged (i.e., either set
-    back or copied beforehand).
+    """Applies a wanted move to the board.
+
+    Args:
+        board: The current state of the game.
+        action: The column to be played.
+        player: The current player to place a piece.
+
+    Returns:
+        np.ndarray: The state of the game after applying the move.
 
     """
 
@@ -114,12 +137,14 @@ def apply_player_action(board: np.ndarray, action: PlayerAction, player: BoardPi
 
 
 def lowest_row(board: np.ndarray, action: PlayerAction) -> int:
-    """
-    returns the correct row, where the move should be executed
+    """Gets the correct row, where the move should be executed.
 
-    :param board:
-    :param action:
-    :return:
+    Args:
+        board: The current state of the game.
+        action: The column to be played.
+
+    Returns:
+        int: The lowest possible row.
     """
     row_size, col_size = board.shape
     for r in range(row_size)[::-1]:
@@ -130,14 +155,14 @@ def lowest_row(board: np.ndarray, action: PlayerAction) -> int:
 
 
 def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
-    """
-    Returns True if there are four adjacent pieces equal to `player` arranged
-    in either a horizontal, vertical, or diagonal line. Returns False otherwise.
+    """Checks if there is 4 adjacent pieces equal to `player` arranged in either a horizontal, vertical, or diagonal line.
 
-    :param board:
-    :param player:
-    :return:
+    Args:
+        board: The current state of the game.
+        player: The current player to place a piece.
 
+    Returns:
+        bool: True if there are four adjacent pieces equal to `player` in one of the 4 directions, False otherwise.
     """
 
     row_kernel = np.ones((4, 1), player)
@@ -154,10 +179,14 @@ def connected_four(board: np.ndarray, player: BoardPiece) -> bool:
 
 
 def check_end_state(board: np.ndarray, player: BoardPiece) -> GameState:
-    """
-    Returns the current game state for the current `player`, i.e. has their last
-    action won (GameState.IS_WIN) or drawn (GameState.IS_DRAW) the game,
-    or is play still on-going (GameState.STILL_PLAYING)?
+    """Checks what the current game state for the current `player` is.
+
+    Args:
+        board: The current state of the game.
+        player: The current player to place a piece.
+
+    Returns:
+        GameState:  GameState.IS_WIN if the player's move won with ther last action won, (GameState.IS_DRAW) if it caused a drawn or (GameState.STILL_PLAYING) if the game is play still on-going .
     """
 
     if connected_four(board, player):
